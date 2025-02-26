@@ -1,16 +1,25 @@
-
 # Web Server Log Analysis using Apache Hive
 
 ## 📌 Project Overview
-This project analyzes web server logs using **Apache Hive** to extract insights such as request frequencies, most visited URLs, failed requests, and user agent distributions. The data is stored in HDFS, and Hive queries are executed to process and retrieve meaningful analytics.
+This project analyzes web server logs using **Apache Hive** to extract insights such as:
+- Total web requests
+- Status code analysis
+- Most visited pages
+- Traffic source analysis
+- Suspicious IP addresses with failed requests
+- Traffic trends over time
+
+Data is stored in HDFS, and Hive queries are executed to process and retrieve meaningful analytics.
 
 ## 🛠️ Implementation Approach
 The analysis is conducted through Hive queries on partitioned datasets. Key queries performed:
 - **Data Ingestion**: Loading web server logs into Hive tables.
 - **Partitioning**: Organizing data based on HTTP response status.
-- **Aggregations & Analysis**: Finding request patterns, user agents, top URLs, and failure rates.
+- **Aggregations & Analysis**: Extracting request patterns, user agents, top URLs, failure rates, and time-based trends.
 
 ## 🔍 Key Queries Used
+
+### 1️⃣ **Create and Load Data**
 ```sql
 CREATE EXTERNAL TABLE IF NOT EXISTS web_server_logs (
     ip STRING,
@@ -25,35 +34,48 @@ FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
 LOCATION '/user/hive/warehouse/web_logs/';
 
+##Enable Dynamic Partitioning in Hive
 SET hive.exec.dynamic.partition = true;
 SET hive.exec.dynamic.partition.mode = nonstrict;
 
+##Insert Data into Partitioned Table
 INSERT INTO TABLE web_server_logs_partitioned PARTITION (status)
 SELECT ip, `timestamp`, url, user_agent, status FROM web_server_logs;
+2️⃣ Total Web Requests
 
-SELECT SUBSTRING(`timestamp`, 1, 16) AS minute, COUNT(*) AS request_count
-FROM web_server_logs
-GROUP BY SUBSTRING(`timestamp`, 1, 16)
-ORDER BY minute;
+SELECT COUNT(*) AS total_requests FROM web_server_logs;
+3️⃣ Status Code Analysis
 
-SELECT ip, COUNT(*) AS failed_requests
-FROM web_server_logs
-WHERE status IN (404, 500)
-GROUP BY ip
-HAVING failed_requests > 3;
-
-SELECT user_agent, COUNT(*) AS count 
+SELECT status, COUNT(*) AS frequency 
 FROM web_server_logs 
-GROUP BY user_agent 
-ORDER BY count DESC;
+GROUP BY status 
+ORDER BY frequency DESC;
+4️⃣ Most Visited Pages
 
 SELECT url, COUNT(*) AS visit_count
 FROM web_server_logs
 GROUP BY url
 ORDER BY visit_count DESC
 LIMIT 3;
+5️⃣ Traffic Source Analysis (User Agents)
 
-SELECT COUNT(*) AS total_requests FROM web_server_logs;
+SELECT user_agent, COUNT(*) AS count 
+FROM web_server_logs 
+GROUP BY user_agent 
+ORDER BY count DESC;
+6️⃣ Suspicious IP Addresses (Failed Requests)
+
+SELECT ip, COUNT(*) AS failed_requests
+FROM web_server_logs
+WHERE status IN (404, 500)
+GROUP BY ip
+HAVING failed_requests > 3;
+7️⃣ Traffic Trend Over Time
+
+SELECT SUBSTRING(`timestamp`, 1, 16) AS minute, COUNT(*) AS request_count
+FROM web_server_logs
+GROUP BY SUBSTRING(`timestamp`, 1, 16)
+ORDER BY minute;
 
 🚀 Execution Steps
 Queries were executed using Hue UI, and results were exported manually.
