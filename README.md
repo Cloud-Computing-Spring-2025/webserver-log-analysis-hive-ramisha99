@@ -55,32 +55,57 @@ LIMIT 3;
 
 SELECT COUNT(*) AS total_requests FROM web_server_logs;
 
-##Execution Steps
+🚀 Execution Steps
+Queries were executed using Hue UI, and results were exported manually.
 
-docker-compose up -d hive-metastore
+Steps:
+Start Hive Metastore and Server
+
+
+docker-compose up 
 docker start hive-server
 docker exec -it namenode bash
 
-hdfs dfs -ls /user/hive/output/
-hdfs dfs -getmerge /user/hive/output/query_results query_results.csv
-docker cp namenode:/query_results.csv ./query_results.csv
+Download Results from Hue UI that was produced by the queries that were ran.
+
+Query results were exported from the Hue UI and saved as CSV files.
+Files saved:
+
+query-hive-50.csv
+query-hive-51.csv
+query-hive-52.csv
+query-hive-53.csv
+query-hive-54.csv
+query-hive-55.csv
+query-hive-59.csv
+query_results.csv
 
 ⚠️ Challenges Faced
 Hive Partitioning Issue: Fixed using SET hive.exec.dynamic.partition = true;
-Moving Exported Files: Used hdfs dfs -getmerge and docker cp to move files.
+Moving Exported Files: Instead of using hdfs dfs -getmerge, results were exported from Hue UI manually.
 Incorrect Table Schema: Removed duplicate column in partitioning.
+
 📂 Sample Input and Output
 📥 Sample Input (web_server_logs.csv)
-csv
-
 
 192.168.1.1,2025-02-26 12:00:00,/home,Mozilla/5.0,200
 192.168.1.2,2025-02-26 12:05:00,/about,Chrome/91.0,404
 192.168.1.3,2025-02-26 12:10:00,/contact,Safari/15.0,500
-📤 Expected Output (query_results.csv)
-c
+📤 Expected Output (query_results.csv and other exported files)
+Each exported file contains results from specific Hive queries. Example:
 
+csv
 minute,request_count
 2025-02-26 12:00,1
 2025-02-26 12:05,1
 2025-02-26 12:10,1
+All query results are stored in:
+
+query-hive-50.csv
+query-hive-51.csv
+query-hive-52.csv
+query-hive-53.csv
+query-hive-54.csv
+query-hive-55.csv
+query-hive-59.csv
+query_results.csv
