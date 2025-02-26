@@ -1,0 +1,4 @@
+partition
+status=200
+status=404
+status=500
