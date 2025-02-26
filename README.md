@@ -72,15 +72,14 @@ Incorrect Table Schema: Removed duplicate column in partitioning.
 📂 Sample Input and Output
 📥 Sample Input (web_server_logs.csv)
 csv
-Copy
-Edit
+
+
 192.168.1.1,2025-02-26 12:00:00,/home,Mozilla/5.0,200
 192.168.1.2,2025-02-26 12:05:00,/about,Chrome/91.0,404
 192.168.1.3,2025-02-26 12:10:00,/contact,Safari/15.0,500
 📤 Expected Output (query_results.csv)
 c
-Copy
-Edit
+
 minute,request_count
 2025-02-26 12:00,1
 2025-02-26 12:05,1
